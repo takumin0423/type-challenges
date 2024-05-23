@@ -1,24 +1,14 @@
 /* _____________ Your Code Here _____________ */
 
-type MyAwaited2<T> = T extends PromiseLike<infer U> ? MyAwaited2<U> : T;
-type MyAwaited<T extends PromiseLike<any>> = MyAwaited2<T>;
+type MyExclude<T, U> = T extends U ? never : T;
 
 /* _____________ Test Cases _____________ */
 import type { Equal, Expect } from "@type-challenges/utils";
 
-type X = Promise<string>;
-type Y = Promise<{ field: number }>;
-type Z = Promise<Promise<string | number>>;
-type Z1 = Promise<Promise<Promise<string | boolean>>>;
-type T = { then: (onfulfilled: (arg: number) => any) => any };
-
 type cases = [
-  Expect<Equal<MyAwaited<X>, string>>,
-  Expect<Equal<MyAwaited<Y>, { field: number }>>,
-  Expect<Equal<MyAwaited<Z>, string | number>>,
-  Expect<Equal<MyAwaited<Z1>, string | boolean>>,
-  Expect<Equal<MyAwaited<T>, number>>
+  Expect<Equal<MyExclude<"a" | "b" | "c", "a">, "b" | "c">>,
+  Expect<Equal<MyExclude<"a" | "b" | "c", "a" | "b">, "c">>,
+  Expect<
+    Equal<MyExclude<string | number | (() => void), Function>, string | number>
+  >
 ];
-
-// @ts-expect-error
-type error = MyAwaited<number>;
