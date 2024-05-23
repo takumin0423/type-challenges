@@ -1,24 +1,24 @@
 /* _____________ Your Code Here _____________ */
 
-type Length<T extends readonly any[]> = T["length"];
+type MyAwaited2<T> = T extends PromiseLike<infer U> ? MyAwaited2<U> : T;
+type MyAwaited<T extends PromiseLike<any>> = MyAwaited2<T>;
 
 /* _____________ Test Cases _____________ */
 import type { Equal, Expect } from "@type-challenges/utils";
 
-const tesla = ["tesla", "model 3", "model X", "model Y"] as const;
-const spaceX = [
-  "FALCON 9",
-  "FALCON HEAVY",
-  "DRAGON",
-  "STARSHIP",
-  "HUMAN SPACEFLIGHT",
-] as const;
+type X = Promise<string>;
+type Y = Promise<{ field: number }>;
+type Z = Promise<Promise<string | number>>;
+type Z1 = Promise<Promise<Promise<string | boolean>>>;
+type T = { then: (onfulfilled: (arg: number) => any) => any };
 
 type cases = [
-  Expect<Equal<Length<typeof tesla>, 4>>,
-  Expect<Equal<Length<typeof spaceX>, 5>>,
-  // @ts-expect-error
-  Length<5>,
-  // @ts-expect-error
-  Length<"hello world">
+  Expect<Equal<MyAwaited<X>, string>>,
+  Expect<Equal<MyAwaited<Y>, { field: number }>>,
+  Expect<Equal<MyAwaited<Z>, string | number>>,
+  Expect<Equal<MyAwaited<Z1>, string | boolean>>,
+  Expect<Equal<MyAwaited<T>, number>>
 ];
+
+// @ts-expect-error
+type error = MyAwaited<number>;
